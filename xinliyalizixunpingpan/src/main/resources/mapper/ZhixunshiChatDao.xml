@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhixunshiChatDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.zhixunshi_id as zhixunshiId
+        ,a.zhixunshi_chat_issue_text as zhixunshiChatIssueText
+        ,a.issue_time as issueTime
+        ,a.zhixunshi_chat_reply_text as zhixunshiChatReplyText
+        ,a.reply_time as replyTime
+        ,a.zhuangtai_types as zhuangtaiTypes
+        ,a.zhixunshi_chat_types as zhixunshiChatTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhixunshiChatView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.yonghu_delete as yonghuDelete
+        ,zhixunshi.zhixunshi_name as zhixunshiName
+        ,zhixunshi.zhixunshi_photo as zhixunshiPhoto
+        ,zhixunshi.zhixunshi_id_number as zhixunshiIdNumber
+        ,zhixunshi.zhixunshi_phone as zhixunshiPhone
+        ,zhixunshi.zhixunshi_email as zhixunshiEmail
+        ,zhixunshi.zhixunshi_congye as zhixunshiCongye
+        ,zhixunshi.zhixunshi_shanchang as zhixunshiShanchang
+        ,zhixunshi.zhixunshi_content as zhixunshiContent
+        ,zhixunshi.zhixunshi_delete as zhixunshiDelete
+
+        FROM zhixunshi_chat  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN zhixunshi zhixunshi ON a.zhixunshi_id = zhixunshi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.zhixunshiId != null and params.zhixunshiId != ''">
+                and (
+                    a.zhixunshi_id = #{params.zhixunshiId}
+                )
+            </if>
+            <if test=" params.zhixunshiChatIssueText != '' and params.zhixunshiChatIssueText != null and params.zhixunshiChatIssueText != 'null' ">
+                and a.zhixunshi_chat_issue_text like CONCAT('%',#{params.zhixunshiChatIssueText},'%')
+            </if>
+            <if test=" params.issueTimeStart != '' and params.issueTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.issue_time) >= UNIX_TIMESTAMP(#{params.issueTimeStart}) ]]>
+            </if>
+            <if test=" params.issueTimeEnd != '' and params.issueTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.issue_time) <= UNIX_TIMESTAMP(#{params.issueTimeEnd}) ]]>
+            </if>
+            <if test=" params.zhixunshiChatReplyText != '' and params.zhixunshiChatReplyText != null and params.zhixunshiChatReplyText != 'null' ">
+                and a.zhixunshi_chat_reply_text like CONCAT('%',#{params.zhixunshiChatReplyText},'%')
+            </if>
+            <if test=" params.replyTimeStart != '' and params.replyTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.reply_time) >= UNIX_TIMESTAMP(#{params.replyTimeStart}) ]]>
+            </if>
+            <if test=" params.replyTimeEnd != '' and params.replyTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.reply_time) <= UNIX_TIMESTAMP(#{params.replyTimeEnd}) ]]>
+            </if>
+            <if test="params.zhuangtaiTypes != null and params.zhuangtaiTypes != ''">
+                and a.zhuangtai_types = #{params.zhuangtaiTypes}
+            </if>
+            <if test="params.zhixunshiChatTypes != null and params.zhixunshiChatTypes != ''">
+                and a.zhixunshi_chat_types = #{params.zhixunshiChatTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+                <!-- 判断咨询师的id不为空 -->
+            <if test=" params.zhixunshiIdNotNull != '' and params.zhixunshiIdNotNull != null and params.zhixunshiIdNotNull != 'null' ">
+                and a.zhixunshi_id IS NOT NULL
+            </if>
+            <if test=" params.zhixunshiName != '' and params.zhixunshiName != null and params.zhixunshiName != 'null' ">
+                and zhixunshi.zhixunshi_name like CONCAT('%',#{params.zhixunshiName},'%')
+            </if>
+            <if test=" params.zhixunshiIdNumber != '' and params.zhixunshiIdNumber != null and params.zhixunshiIdNumber != 'null' ">
+                and zhixunshi.zhixunshi_id_number like CONCAT('%',#{params.zhixunshiIdNumber},'%')
+            </if>
+            <if test=" params.zhixunshiPhone != '' and params.zhixunshiPhone != null and params.zhixunshiPhone != 'null' ">
+                and zhixunshi.zhixunshi_phone like CONCAT('%',#{params.zhixunshiPhone},'%')
+            </if>
+            <if test=" params.zhixunshiEmail != '' and params.zhixunshiEmail != null and params.zhixunshiEmail != 'null' ">
+                and zhixunshi.zhixunshi_email like CONCAT('%',#{params.zhixunshiEmail},'%')
+            </if>
+            <if test=" params.zhixunshiCongye != '' and params.zhixunshiCongye != null and params.zhixunshiCongye != 'null' ">
+                and zhixunshi.zhixunshi_congye like CONCAT('%',#{params.zhixunshiCongye},'%')
+            </if>
+            <if test=" params.zhixunshiShanchang != '' and params.zhixunshiShanchang != null and params.zhixunshiShanchang != 'null' ">
+                and zhixunshi.zhixunshi_shanchang like CONCAT('%',#{params.zhixunshiShanchang},'%')
+            </if>
+            <if test=" params.zhixunshiContent != '' and params.zhixunshiContent != null and params.zhixunshiContent != 'null' ">
+                and zhixunshi.zhixunshi_content like CONCAT('%',#{params.zhixunshiContent},'%')
+            </if>
+            <if test="params.zhixunshiDeleteStart != null  and params.zhixunshiDeleteStart != '' ">
+                <![CDATA[  and zhixunshi.zhixunshi_delete >= #{params.zhixunshiDeleteStart}   ]]>
+            </if>
+            <if test="params.zhixunshiDeleteEnd != null  and params.zhixunshiDeleteEnd != '' ">
+                <![CDATA[  and zhixunshi.zhixunshi_delete <= #{params.zhixunshiDeleteEnd}   ]]>
+            </if>
+            <if test="params.zhixunshiDelete != null  and params.zhixunshiDelete != '' ">
+                and zhixunshi.zhixunshi_delete = #{params.zhixunshiDelete}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

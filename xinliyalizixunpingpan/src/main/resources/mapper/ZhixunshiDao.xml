@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhixunshiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.username as username
+        ,a.password as password
+        ,a.zhixunshi_name as zhixunshiName
+        ,a.sex_types as sexTypes
+        ,a.zhixunshi_photo as zhixunshiPhoto
+        ,a.zhixunshi_id_number as zhixunshiIdNumber
+        ,a.zhixunshi_phone as zhixunshiPhone
+        ,a.zhixunshi_email as zhixunshiEmail
+        ,a.zhixunshi_congye as zhixunshiCongye
+        ,a.zhixunshi_shanchang as zhixunshiShanchang
+        ,a.zhixunshi_content as zhixunshiContent
+        ,a.zhixunshi_delete as zhixunshiDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhixunshiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM zhixunshi  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.zhixunshiName != '' and params.zhixunshiName != null and params.zhixunshiName != 'null' ">
+                and a.zhixunshi_name like CONCAT('%',#{params.zhixunshiName},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.zhixunshiIdNumber != '' and params.zhixunshiIdNumber != null and params.zhixunshiIdNumber != 'null' ">
+                and a.zhixunshi_id_number like CONCAT('%',#{params.zhixunshiIdNumber},'%')
+            </if>
+            <if test=" params.zhixunshiPhone != '' and params.zhixunshiPhone != null and params.zhixunshiPhone != 'null' ">
+                and a.zhixunshi_phone like CONCAT('%',#{params.zhixunshiPhone},'%')
+            </if>
+            <if test=" params.zhixunshiEmail != '' and params.zhixunshiEmail != null and params.zhixunshiEmail != 'null' ">
+                and a.zhixunshi_email like CONCAT('%',#{params.zhixunshiEmail},'%')
+            </if>
+            <if test=" params.zhixunshiCongye != '' and params.zhixunshiCongye != null and params.zhixunshiCongye != 'null' ">
+                and a.zhixunshi_congye like CONCAT('%',#{params.zhixunshiCongye},'%')
+            </if>
+            <if test=" params.zhixunshiShanchang != '' and params.zhixunshiShanchang != null and params.zhixunshiShanchang != 'null' ">
+                and a.zhixunshi_shanchang like CONCAT('%',#{params.zhixunshiShanchang},'%')
+            </if>
+            <if test=" params.zhixunshiContent != '' and params.zhixunshiContent != null and params.zhixunshiContent != 'null' ">
+                and a.zhixunshi_content like CONCAT('%',#{params.zhixunshiContent},'%')
+            </if>
+            <if test="params.zhixunshiDeleteStart != null and params.zhixunshiDeleteStart != ''">
+                <![CDATA[  and a.zhixunshi_delete >= #{params.zhixunshiDeleteStart}   ]]>
+            </if>
+            <if test="params.zhixunshiDeleteEnd != null and params.zhixunshiDeleteEnd != ''">
+                <![CDATA[  and a.zhixunshi_delete <= #{params.zhixunshiDeleteEnd}   ]]>
+            </if>
+             <if test="params.zhixunshiDelete != null and params.zhixunshiDelete != ''">
+                and a.zhixunshi_delete = #{params.zhixunshiDelete}
+             </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
